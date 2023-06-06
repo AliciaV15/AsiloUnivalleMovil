@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "asilomovil",
+    "slug": "asilomovil",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
