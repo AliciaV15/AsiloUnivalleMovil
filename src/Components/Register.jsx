@@ -1,24 +1,55 @@
 import React from "react";
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView  } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+import { database } from "../config/fb";
+import { collection, addDoc } from "firebase/firestore";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Register() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [name, setName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [identification, setIdentification] = useState('');
-    const [address, setAddress] = useState('');
-    const [phone, setPhone] = useState('');
-    const [email, setEmail] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-  
-    const handleRegister = () => {
-      // Lógica para registrar un nuevo usuario
+  const navigation = useNavigation();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [apellido, setApellido] = useState("");
+  const [carnet, setCarnet] = useState("");
+  const [domicilio, setDomicilio] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [email, setEmail] = useState("");
+
+  const handleRegister = async () => {
+    const benefactor = {
+      username,
+      nombre,
+      apellido,
+      carnet,
+      domicilio,
+      telefono,
+      email,
+      password,
     };
+    try {
+      await addDoc(collection(database, "beneficiario"), benefactor);
+      alert("Registro exitoso");
+      navigation.goBack();
+    } catch (error) {
+      alert("Error al registrar: " + error.message);
+    }
+  };
   return (
     <>
-      <ScrollView  contentContainerStyle={{ flexGrow: 1, alignItems: "center", justifyContent: "center" }}>
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>
           Registro de usuario
         </Text>
@@ -45,8 +76,8 @@ export default function Register() {
             marginBottom: 10,
           }}
           placeholder="Nombres"
-          value={name}
-          onChangeText={setName}
+          value={nombre}
+          onChangeText={setNombre}
         />
         <TextInput
           style={{
@@ -58,8 +89,8 @@ export default function Register() {
             marginBottom: 10,
           }}
           placeholder="Apellidos"
-          value={lastName}
-          onChangeText={setLastName}
+          value={apellido}
+          onChangeText={setApellido}
         />
         <TextInput
           style={{
@@ -71,8 +102,8 @@ export default function Register() {
             marginBottom: 10,
           }}
           placeholder="Carnet de identidad"
-          value={identification}
-          onChangeText={setIdentification}
+          value={carnet}
+          onChangeText={setCarnet}
         />
         <TextInput
           style={{
@@ -84,8 +115,8 @@ export default function Register() {
             marginBottom: 10,
           }}
           placeholder="Domicilio"
-          value={address}
-          onChangeText={setAddress}
+          value={domicilio}
+          onChangeText={setDomicilio}
         />
         <TextInput
           style={{
@@ -97,8 +128,8 @@ export default function Register() {
             marginBottom: 10,
           }}
           placeholder="Teléfono"
-          value={phone}
-          onChangeText={setPhone}
+          value={telefono}
+          onChangeText={setTelefono}
         />
         <TextInput
           style={{
@@ -127,20 +158,7 @@ export default function Register() {
           value={password}
           onChangeText={setPassword}
         />
-        <TextInput
-          style={{
-            width: 300,
-            height: 40,
-            borderWidth: 1,
-            borderRadius: 20,
-            paddingHorizontal: 10,
-            marginBottom: 20,
-          }}
-          placeholder="Confirmar contraseña"
-          secureTextEntry
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-        />
+
         <TouchableOpacity
           style={{
             width: 150,

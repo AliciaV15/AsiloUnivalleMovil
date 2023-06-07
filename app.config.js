@@ -1,4 +1,5 @@
-{
+
+export default{
   "expo": {
     "name": "asilomovil",
     "slug": "asilomovil",
@@ -7,4 +8,5 @@
       "**/*"
     ]
   }
+
 }
