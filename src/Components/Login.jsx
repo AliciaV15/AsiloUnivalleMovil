@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { useState } from 'react';
+import { database } from '../config/fb';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 
 
@@ -8,11 +10,32 @@ export default function Login({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    if (username === 'admin' && password === 'password') {
-      alert('Inicio de sesión exitoso');
-    } else {
-      alert('Credenciales inválidas');
+  const handleLogin = async () => {
+    try {
+      const benefactorsQuery = query(
+        collection(database, "beneficiario"),
+        where("username", "==", username)
+      );
+      
+      const benefactorsSnapshot = await getDocs(benefactorsQuery);
+      
+      let isUserFound = false;
+  
+      benefactorsSnapshot.forEach((benefactorSnapshot) => {
+        const benefactorData = benefactorSnapshot.data();
+        if (benefactorData.password === password) {
+          isUserFound = true;
+          // Realiza las acciones necesarias si se encuentra el beneficiario
+        }
+      });
+  
+      if (isUserFound) {
+        alert("Ingreso exitoso");
+      } else {
+        alert("Beneficiario no encontrado o contraseña incorrecta");
+      }
+    } catch (error) {
+      alert("Error al iniciar sesión: " + error.message);
     }
   };
   return (
