@@ -3,6 +3,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { database } from "../config/fb";
+import { useNavigation } from "@react-navigation/native";
 import {
   collection,
   onSnapshot,
@@ -13,6 +14,7 @@ import {
 } from "firebase/firestore";
 
 export default function ActiveCampaign() {
+  const navigation = useNavigation();
   const [campaign, setCampaign] = useState([]);
 
   useEffect(() => {
@@ -38,6 +40,9 @@ export default function ActiveCampaign() {
 
     return unsuscribe;
   }, []);
+  const handleDonar = (item) => {
+    navigation.navigate("Donation");
+  };
   const getBeneficiarioIcon = (beneficiario) => {
     let iconName;
 
@@ -59,12 +64,9 @@ export default function ActiveCampaign() {
       {campaign.map((item) => (
         <RN.View key={item.id} style={styles.productContainer}>
           <RN.View style={styles.imageContainer}>
-        <RN.Image
-          source={{ uri: item.urlImagen }}
-          style={styles.image}
-        />
-      </RN.View>
-        
+            <RN.Image source={{ uri: item.urlImagen }} style={styles.image} />
+          </RN.View>
+
           <RN.Text style={styles.name}>{item.nombre}</RN.Text>
           <RN.Text style={styles.fechas}>
             Inicio: {item.fechaInicio.toLocaleDateString()}
@@ -78,7 +80,10 @@ export default function ActiveCampaign() {
             size={24}
             color="lightblue"
           />
-          <RN.TouchableOpacity style={styles.button}>
+          <RN.TouchableOpacity
+            style={styles.button}
+            onPress={() => handleDonar(item)}
+          >
             <RN.Text style={styles.buttonText}>Donar </RN.Text>
           </RN.TouchableOpacity>
         </RN.View>
@@ -93,7 +98,7 @@ const styles = RN.StyleSheet.create({
     margin: 16,
     borderRadius: 8,
   },
- 
+
   name: {
     fontSize: 25,
     fontWeight: "bold",
@@ -125,11 +130,11 @@ const styles = RN.StyleSheet.create({
     margin: 10,
     height: 100,
     borderRadius: 20,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginRight: 10,
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
 });

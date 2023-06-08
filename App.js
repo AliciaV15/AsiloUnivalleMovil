@@ -5,6 +5,7 @@ import Inicio from './src/Components/Inicio';
 import Register from './src/Components/Register';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import Donation from './src/Components/Donation';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Inicio" component={Inicio} />
+        <Stack.Screen name="Donation" component={Donation} />
       </Stack.Navigator>
     </NavigationContainer>
   );
