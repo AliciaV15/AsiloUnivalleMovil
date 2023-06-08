@@ -10,37 +10,48 @@ import {
 import { database } from "../config/fb";
 import { collection, addDoc } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 export default function Register() {
   const navigation = useNavigation();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [nombre, setNombre] = useState("");
-  const [apellido, setApellido] = useState("");
-  const [carnet, setCarnet] = useState("");
-  const [domicilio, setDomicilio] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [email, setEmail] = useState("");
+  const [Username, setUsername] = useState("");
+  const [Password, setPassword] = useState("");
+  const [Nombres, setNombre] = useState("");
+  const [Apellidos, setApellido] = useState("");
+  const [Carnet, setCarnet] = useState("");
+  const [Direccion, setDomicilio] = useState("");
+  const [Telefono, setTelefono] = useState("");
+  const [Email, setEmail] = useState("");
 
   const handleRegister = async () => {
     const benefactor = {
-      username,
-      nombre,
-      apellido,
-      carnet,
-      domicilio,
-      telefono,
-      email,
-      password,
+      Username,
+      Password,
+      Nombres,
+      Apellidos,
+      Carnet,
+      Telefono,
+      Email,
+      Direccion,
     };
     try {
       await addDoc(collection(database, "beneficiario"), benefactor);
-      alert("Registro exitoso");
-      navigation.goBack();
+      alert("Registro exitoso en Firebase Firestore");
+      // Realizar solicitud POST a la API
+      const response = await axios.post('https://apidelasilo.azurewebsites.net/api/Benefactors',benefactor);
+      // Haz lo que necesites con la respuesta de la API
+      if (response.status === 201) {
+        alert("Registro exitoso en la API");
+        navigation.goBack();
+      } else {
+        alert("Error en el registro en la API");
+        console.log(response);
+      }
     } catch (error) {
       alert("Error al registrar: " + error.message);
     }
   };
+
   return (
     <>
       <ScrollView
@@ -63,7 +74,7 @@ export default function Register() {
             marginBottom: 10,
           }}
           placeholder="Nombre de usuario"
-          value={username}
+          value={Username}
           onChangeText={setUsername}
         />
         <TextInput
@@ -76,7 +87,7 @@ export default function Register() {
             marginBottom: 10,
           }}
           placeholder="Nombres"
-          value={nombre}
+          value={Nombres}
           onChangeText={setNombre}
         />
         <TextInput
@@ -89,7 +100,7 @@ export default function Register() {
             marginBottom: 10,
           }}
           placeholder="Apellidos"
-          value={apellido}
+          value={Apellidos}
           onChangeText={setApellido}
         />
         <TextInput
@@ -102,7 +113,7 @@ export default function Register() {
             marginBottom: 10,
           }}
           placeholder="Carnet de identidad"
-          value={carnet}
+          value={Carnet}
           onChangeText={setCarnet}
         />
         <TextInput
@@ -115,7 +126,7 @@ export default function Register() {
             marginBottom: 10,
           }}
           placeholder="Domicilio"
-          value={domicilio}
+          value={Direccion}
           onChangeText={setDomicilio}
         />
         <TextInput
@@ -128,7 +139,7 @@ export default function Register() {
             marginBottom: 10,
           }}
           placeholder="Teléfono"
-          value={telefono}
+          value={Telefono}
           onChangeText={setTelefono}
         />
         <TextInput
@@ -141,7 +152,7 @@ export default function Register() {
             marginBottom: 10,
           }}
           placeholder="Email"
-          value={email}
+          value={Email}
           onChangeText={setEmail}
         />
         <TextInput
@@ -155,7 +166,7 @@ export default function Register() {
           }}
           placeholder="Contraseña"
           secureTextEntry
-          value={password}
+          value={Password}
           onChangeText={setPassword}
         />
 
