@@ -3,7 +3,10 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ActiveCampaign from './ActiveCampaign';
 import CloseCampaign from './CloseCampaign';
+import DonationList from './Donation';
+import NewDonation from './NewDonation';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 const Tab = createBottomTabNavigator();
 export default function Inicio() {
@@ -22,8 +25,19 @@ export default function Inicio() {
             <MaterialCommunityIcons name="table-cancel" color={color} size={size} />
           )
          
-        }} />
+          }} />
+   
+          <Tab.Screen name="Donaciones" component={DonationList} options={{
+              tabBarLabel: 'Donaciones',
+              tabBarIcon: ({ color, size }) => (
+                  <MaterialCommunityIcons name="hand-coin" color={color} size={size} />
+              ),
+            
+          }} />
         
     </Tab.Navigator>
-  )
+
+    )
+
+
 }

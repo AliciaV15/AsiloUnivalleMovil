@@ -10,36 +10,46 @@ export default function Login({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
-    try {
-      const benefactorsQuery = query(
-        collection(database, "beneficiario"),
-        where("username", "==", username)
-      );
-
-      const benefactorsSnapshot = await getDocs(benefactorsQuery);
-
-      let isUserFound = false;
-
-      benefactorsSnapshot.forEach((benefactorSnapshot) => {
-        const benefactorData = benefactorSnapshot.data();
-        if (benefactorData.password === password) {
-          isUserFound = true;
-          AsyncStorage.setItem("benefactor", JSON.stringify(benefactorData));
-
-          //console.log(benefactorData)
+    const handleLogin = () => {
+        if (username === 'admin' && password === 'password') {
+            alert('Inicio de sesión exitoso');
+            navigation.navigate("Inicio");
+        } else {
+            alert('Credenciales inválidas');
         }
-      });
+    };
 
-      if (isUserFound) {
-        navigation.navigate("Inicio");
-      } else {
-        alert("Beneficiario no encontrado o contraseña incorrecta");
-      }
-    } catch (error) {
-      alert("Error al iniciar sesión: " + error.message);
-    }
-  };
+
+  //const handleLogin = async () => {
+  //  try {
+  //    const benefactorsQuery = query(
+  //      collection(database, "beneficiario"),
+  //      where("username", "==", username)
+  //    );
+
+  //    const benefactorsSnapshot = await getDocs(benefactorsQuery);
+
+  //    let isUserFound = false;
+
+  //    benefactorsSnapshot.forEach((benefactorSnapshot) => {
+  //      const benefactorData = benefactorSnapshot.data();
+  //      if (benefactorData.password === password) {
+  //        isUserFound = true;
+  //        AsyncStorage.setItem("benefactor", JSON.stringify(benefactorData));
+
+  //        //console.log(benefactorData)
+  //      }
+  //    });
+
+  //    if (username === 'admin' && password==='1324') {
+  //      navigation.navigate("Inicio");
+  //    } else {
+  //      alert("Beneficiario no encontrado o contraseña incorrecta");
+  //    }
+  //  } catch (error) {
+  //    alert("Error al iniciar sesión: " + error.message);
+  //  }
+  //};
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>
