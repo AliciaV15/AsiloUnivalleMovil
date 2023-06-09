@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ActiveCampaign from './ActiveCampaign';
 import CloseCampaign from './CloseCampaign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MisDonaciones from './MisDonaciones';
 
 const Tab = createBottomTabNavigator();
 export default function Inicio() {
@@ -20,6 +21,13 @@ export default function Inicio() {
           tabBarLabel: 'Campañas Cerradas',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="table-cancel" color={color} size={size} />
+          )
+         
+        }} />
+        <Tab.Screen name="Mis Donaciones" component={MisDonaciones} options={{
+          tabBarLabel: 'Mis Donciones',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="account-box" color={color} size={size} />
           )
          
         }} />
