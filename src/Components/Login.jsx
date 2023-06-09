@@ -16,21 +16,27 @@ export default function Login({ navigation }) {
         collection(database, "beneficiario"),
         where("username", "==", username)
       );
-
+  
       const benefactorsSnapshot = await getDocs(benefactorsQuery);
-
+  
       let isUserFound = false;
-
+  
       benefactorsSnapshot.forEach((benefactorSnapshot) => {
         const benefactorData = benefactorSnapshot.data();
         if (benefactorData.password === password) {
           isUserFound = true;
-          AsyncStorage.setItem("benefactor", JSON.stringify(benefactorData));
-
+  
+          // Obtener el ID del benefactor
+          const benefactorId = benefactorSnapshot.id;
+  
+          // Guardar los datos del benefactor en AsyncStorage
+          const benefactorDataWithId = { ...benefactorData, id: benefactorId };
+          AsyncStorage.setItem("benefactor", JSON.stringify(benefactorDataWithId));
+  
           //console.log(benefactorData)
         }
       });
-
+  
       if (isUserFound) {
         navigation.navigate("Inicio");
       } else {

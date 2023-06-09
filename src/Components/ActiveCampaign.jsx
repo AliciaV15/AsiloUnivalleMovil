@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { database } from "../config/fb";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   collection,
   onSnapshot,
@@ -40,8 +41,21 @@ export default function ActiveCampaign() {
 
     return unsuscribe;
   }, []);
-  const handleDonar = (item) => {
-    navigation.navigate("Donation");
+  const handleDonar = async (item) => {
+    try {
+      // Verificar si existe una campaña guardada
+      const campaignData = await AsyncStorage.getItem("campaña");
+      if (campaignData !== null) {
+        // Si existe una campaña guardada, borrarla
+        await AsyncStorage.removeItem("campaña");
+      }
+      // Guardar la nueva campaña
+      await AsyncStorage.setItem("campaña", JSON.stringify(item));
+      // Navegar a la pantalla de donación
+      navigation.navigate("Donation");
+    } catch (error) {
+      console.log("Error al manejar la donación:", error);
+    }
   };
   const getBeneficiarioIcon = (beneficiario) => {
     let iconName;
