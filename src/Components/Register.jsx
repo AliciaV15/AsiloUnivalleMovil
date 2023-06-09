@@ -36,12 +36,12 @@ export default function Register() {
     };
     try {
       await addDoc(collection(database, "beneficiario"), benefactor);
-      alert("Registro exitoso en Firebase Firestore");
+      //alert("Registro exitoso en Firebase Firestore");
       // Realizar solicitud POST a la API
       const response = await axios.post('https://apidelasilo.azurewebsites.net/api/Benefactors',benefactor);
       // Haz lo que necesites con la respuesta de la API
       if (response.status === 201) {
-        alert("Registro exitoso en la API");
+        alert("Registro exitoso ");
         navigation.goBack();
       } else {
         alert("Error en el registro en la API");

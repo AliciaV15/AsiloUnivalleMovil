@@ -5,13 +5,16 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { database } from "../config/fb";
 import { collection, addDoc } from "firebase/firestore";
+import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
 
 export default function DonationForm() {
+  const navigation = useNavigation();
   const [isAnonimo, setIsAnonimo] = useState(false);
   const [donationType, setDonationType] = useState("");
   const [Items, setItems] = useState("");
-  const [Dinero, setDinero] = useState(0.0);
-  const [Estado, setEstado] = useState(0);
+  let [Dinero, setDinero] = useState(0);
+  const [Estado, setEstado] = useState(1);
 
   const [Descripcion, setDescripcion] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -19,6 +22,7 @@ export default function DonationForm() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   var Anonimo = 0;
+  var IdDonacion = 0;
 
   const handleDonationTypeChange = (type) => {
     setDonationType(type);
@@ -53,13 +57,32 @@ export default function DonationForm() {
     const campañaData = await AsyncStorage.getItem('campaña');
     const parsedBenefactorData = JSON.parse(benefactorData);
     const parsedCampañaData = JSON.parse(campañaData);
+   
     const IdBenefactor = parsedBenefactorData.id.toString();
     const IdCampana = parsedCampañaData.id.toString();
+    const nombreBenefactor = parsedBenefactorData.Username;
+    const nombreCampana = parsedCampañaData.nombre;
+    
     if(isAnonimo){
       Anonimo = 1
     }
+  
+    
 
-    const donacion = {
+    let donacion = {
+      Descripcion,
+      Anonimo,
+      Estado,
+      Dinero,
+      Items,
+      FechaDonacion,
+      FechaRecojo,
+      IdBenefactor,
+      IdCampana,
+      IdDonacion
+      
+    };
+    let donacionA = {
       Descripcion,
       Anonimo,
       Estado,
@@ -71,19 +94,65 @@ export default function DonationForm() {
       IdCampana,
       
     };
-    try {
-      await addDoc(collection(database, "donacion"), donacion);
-      
-      
-      // const response = await axios.post('https://apidelasilo.azurewebsites.net/api/Benefactors',benefactor);
     
-      // if (response.status === 201) {
-      //   alert("Registro exitoso en la API");
-      //   navigation.goBack();
-      // } else {
-      //   alert("Error en el registro en la API");
-      //   console.log(response);
-      // }
+    try {
+      const IdDon = await fetch(
+        `https://apidelasilo.azurewebsites.net/api/DonationsLastId`
+      );
+
+      const data = await IdDon.json();
+      console.log(data)
+      donacion.IdDonacion = data + 1;
+      await addDoc(collection(database, "donacion"), donacion);
+      //
+      const buscarBenefactorPorNombre = async (nombre) => {
+        try {
+          const benefactorResponse = await axios.get(
+            `https://apidelasilo.azurewebsites.net/api/Benefactors`
+          );
+        
+          const benefactores = benefactorResponse.data;
+        
+      
+          // Buscar el benefactor por su nombre
+          const benefactorEncontrado = benefactores.find(
+            (benefactor) => benefactor.username == nombre
+          );
+      
+          if (benefactorEncontrado) {
+            return benefactorEncontrado.idBenefactor;
+          } else {
+            return null; // Retornar null si no se encontró el benefactor
+          }
+        } catch (error) {
+          console.error("Error al buscar el benefactor:", error);
+          return null; // Retornar null en caso de error
+        }
+      };
+      
+      
+      
+      //
+      
+      
+      // Ejemplo de uso:
+     
+      const idBenefactorB = await buscarBenefactorPorNombre(nombreBenefactor);
+      const idCampanaB = parsedCampañaData.idcamp;
+      donacionA.IdBenefactor = idBenefactorB;
+      donacionA.IdCampana = idCampanaB;
+      if(donacionA.Dinero == ""){
+        donacionA.Dinero = 0
+      }
+       const response = await axios.post(
+         "https://apidelasilo.azurewebsites.net/api/Donacions",
+         donacionA
+       );
+       alert("Registro exitoso ");
+       navigation.goBack();
+      
+      
+     
     } catch (error) {
       alert("Error al registrar: " + error.message);
     }
@@ -141,10 +210,12 @@ export default function DonationForm() {
 
       {(donationType === "Dinero" || donationType === "Ambos") && (
         <TextInput
+        keyboardType="numeric"
         style={styles.input}
         placeholder="Registrar dinero"
-        value={Dinero.toString()}
+        value={parseFloat(Dinero)}
         onChangeText={(text) => setDinero(parseFloat(text))}
+        
       />
       )}
 

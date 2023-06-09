@@ -7,14 +7,14 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 
 export default function Login({ navigation }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [Username, setUsername] = useState("");
+  const [Password, setPassword] = useState("");
 
   const handleLogin = async () => {
     try {
       const benefactorsQuery = query(
         collection(database, "beneficiario"),
-        where("username", "==", username)
+        where("Username", "==", Username)
       );
   
       const benefactorsSnapshot = await getDocs(benefactorsQuery);
@@ -23,7 +23,7 @@ export default function Login({ navigation }) {
   
       benefactorsSnapshot.forEach((benefactorSnapshot) => {
         const benefactorData = benefactorSnapshot.data();
-        if (benefactorData.password === password) {
+        if (benefactorData.Password === Password) {
           isUserFound = true;
   
           // Obtener el ID del benefactor
@@ -61,7 +61,7 @@ export default function Login({ navigation }) {
           marginBottom: 10,
         }}
         placeholder="Nombre de usuario"
-        value={username}
+        value={Username}
         onChangeText={setUsername}
       />
       <TextInput
@@ -75,7 +75,7 @@ export default function Login({ navigation }) {
         }}
         placeholder="Contraseña"
         secureTextEntry
-        value={password}
+        value={Password}
         onChangeText={setPassword}
       />
       <TouchableOpacity

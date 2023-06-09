@@ -1,20 +1,22 @@
 import * as RN from "react-native";
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { database } from "../config/fb";
-
+import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   collection,
   onSnapshot,
+  doc,
   query,
   where,
   orderBy,
 } from "firebase/firestore";
 
 export default function MisDonaciones() {
-  const [donacion, setDonacion] = useState([]);
-  const [campana, setCampana] = useState([]);
+  const navigation = useNavigation();
+  const [campaign, setCampaign] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,46 +25,33 @@ export default function MisDonaciones() {
         const parsedBenefactorData = JSON.parse(benefactorData);
         const IdBenefactor = parsedBenefactorData.id.toString();
 
-        const donacionCollectionRef = collection(database, "donacion");
-        const campanaCollectionRef = collection(database, "campana");
+        const collectionRef = collection(database, "donacion");
 
-        const donacionQuery = query(donacionCollectionRef);
+        const q = query(collectionRef, orderBy("FechaDonacion", "asc"));
+        const unsuscribe = onSnapshot(q, (querySnapshot) => {
 
-        const campanaQuery = query(campanaCollectionRef);
 
-     
+          const filteredCampaigns = querySnapshot.docs
+            .map((doc) => ({
+              id: doc.id,
+              descripcion: doc.data().Descripcion,
+              IdBenefactor: doc.data().IdBenefactor,
+              Dinero: doc.data().Dinero,
+              Items: doc.data().Items,
+              FechaDonacion: doc.data().FechaDonacion.toDate(),
 
-        const unsubscribeDonacion = onSnapshot(
-          donacionQuery,
-          (donacionSnapshot) => {
-            const donaciones = donacionSnapshot.docs
-              .map((donacionDoc) => ({
-                id: donacionDoc.id,
-                descripcion: donacionDoc.data().Descripcion,
-                anonimo: donacionDoc.data().Anonimo,
-                estado: donacionDoc.data().Estado,
-                dinero: donacionDoc.data().Dinero,
-                items: donacionDoc.data().Items,
-                fechaDonacion: donacionDoc.data().FechaDonacion.toDate(),
-                fechaRecojo: donacionDoc.data().FechaRecojo.toDate(),
-                idCampana: donacionDoc.data().IdCampana,
-                idBenefactor: donacionDoc.data().IdBenefactor,
-                
-              }))
-              .filter((item) => item.idBenefactor == IdBenefactor);
-            setDonacion(donaciones);
-          }
-        );
+              Anonimo: doc.data().Anonimo,
+              // estado: doc.data().Estado,
+              // idcamp: doc.data().IdCampana
 
-        
 
-        
-        
-        return unsubscribeDonacion;
-        // return () => {
-        //   unsubscribeDonacion();
-        //   unsubscribeCampana();
-        // };
+            }))
+            .filter((item) => item.IdBenefactor == IdBenefactor);
+          setCampaign(filteredCampaigns);
+
+        });
+
+        return unsuscribe;
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -70,7 +59,22 @@ export default function MisDonaciones() {
 
     fetchData();
   }, []);
-
+  const handleDonar = async (item) => {
+    try {
+      // Verificar si existe una campaña guardada
+      const campaignData = await AsyncStorage.getItem("campaña");
+      if (campaignData !== null) {
+        // Si existe una campaña guardada, borrarla
+        await AsyncStorage.removeItem("campaña");
+      }
+      // Guardar la nueva campaña
+      await AsyncStorage.setItem("campaña", JSON.stringify(item));
+      // Navegar a la pantalla de donación
+      navigation.navigate("Donation");
+    } catch (error) {
+      console.log("Error al manejar la donación:", error);
+    }
+  };
   const getBeneficiarioIcon = (beneficiario) => {
     let iconName;
 
@@ -89,13 +93,43 @@ export default function MisDonaciones() {
 
   return (
     <RN.ScrollView>
-      {donacion.map((item) => (
-        <RN.Text key={item.id}>{item.campana.Nombre}</RN.Text>
+      {campaign.map((item) => (
+        <RN.View key={item.id} style={styles.productContainer}>
+          {/* <RN.View style={styles.imageContainer}>
+            <RN.Image source={{ uri: item.urlImagen }} style={styles.image} />
+          </RN.View> */}
+          <RN.Text style={styles.name}>Tu Donación</RN.Text>
+          <RN.Text style={styles.price}> Descripción: {item.descripcion}</RN.Text>
+          <RN.Text style={styles.fechas}>
+            Se realizó el: {item.FechaDonacion.toLocaleDateString()}
+          </RN.Text>
+          <RN.Text style={styles.Anon}>
+  {item.Anonimo === 1 ? 'Donación Anónima' : 'Donación Pública'}
+</RN.Text>
+<RN.Text style={styles.don}>
+ {item.Dinero !== "" ? "Donación Monetaria:" +item.Dinero : ''}
+</RN.Text>
+<RN.Text style={styles.don}>
+  {item.Items !== "" ? "ItemsDonados" + item.Items : ''}
+</RN.Text>
+          {/* 
+          <RN.Text style={styles.price}>{item.requerimiento}</RN.Text>
+          <AntDesign
+            name={getBeneficiarioIcon(item.beneficiario)}
+            size={24}
+            color="lightblue"
+          />
+          <RN.TouchableOpacity
+            style={styles.button}
+            onPress={() => handleDonar(item)}
+          >
+            <RN.Text style={styles.buttonText}>Donar </RN.Text>
+          </RN.TouchableOpacity> */}
+        </RN.View>
       ))}
     </RN.ScrollView>
   );
 }
-
 const styles = RN.StyleSheet.create({
   productContainer: {
     padding: 16,
@@ -103,6 +137,7 @@ const styles = RN.StyleSheet.create({
     margin: 16,
     borderRadius: 8,
   },
+
   name: {
     fontSize: 25,
     fontWeight: "bold",
@@ -110,23 +145,24 @@ const styles = RN.StyleSheet.create({
   },
   price: {
     fontSize: 17,
+
     color: "gray",
   },
-  button: {
-    backgroundColor: "#0FA5E9",
-    padding: 8,
-    marginVertical: 6,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  buttonText: {
-    fontSize: 18,
+  Anon: {
+    fontSize: 15,
     fontWeight: "bold",
-    color: "#fff",
+    
+    color: "gray",
+  },
+  don: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "gray",
   },
   fechas: {
     fontSize: 14,
-    color: "gray",
+    color: "#fff",
+    backgroundColor: "#0FA5E9",
     fontWeight: "bold",
   },
   imageContainer: {

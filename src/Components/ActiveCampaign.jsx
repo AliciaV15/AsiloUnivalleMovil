@@ -19,24 +19,30 @@ export default function ActiveCampaign() {
   const [campaign, setCampaign] = useState([]);
 
   useEffect(() => {
-    const collectionRef = collection(database, "campaña");
-    const q = query(collectionRef, orderBy("fechaInicio", "asc"));
+    const collectionRef = collection(database, "campaings");
+   
+    const q = query(collectionRef, orderBy("FechaInicio", "asc"));
     const unsuscribe = onSnapshot(q, (querySnapshot) => {
+      
       const currentDate = new Date();
       const filteredCampaigns = querySnapshot.docs
         .map((doc) => ({
           id: doc.id,
-          nombre: doc.data().nombre,
-          requerimiento: doc.data().requerimiento,
-          beneficiario: doc.data().beneficiario,
-          urlImagen: doc.data().urlImagen,
-          fechaInicio: doc.data().fechaInicio.toDate(),
-          fechaFin: doc.data().fechaFin.toDate(),
-          idAsilo: doc.data().idAsilo,
-          estado: doc.data().estado,
+          nombre: doc.data().Nombre,
+          requerimiento: doc.data().Requerimiento,
+          beneficiario: doc.data().Beneficiario,
+          urlImagen: doc.data().UrlImagen,
+          fechaInicio: doc.data().FechaInicio.toDate(),
+          fechaFin: doc.data().FechaFin.toDate(),
+          idAsilo: doc.data().IdAsilo,
+          estado: doc.data().Estado,
+          idcamp: doc.data().IdCampana
+
+          
         }))
-        .filter((item) => item.fechaFin > currentDate && item.estado == 1);
+        .filter((item) => item.fechaFin > currentDate && item.estado == 0);
       setCampaign(filteredCampaigns);
+    
     });
 
     return unsuscribe;
